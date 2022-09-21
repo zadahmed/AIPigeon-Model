@@ -1,0 +1,52 @@
+## Configuration for Rasa NLU.
+## https://rasa.com/docs/rasa/nlu/components/
+#language: zh
+#pipeline: supervised_embeddings
+
+## Configuration for Rasa Core.
+## https://rasa.com/docs/rasa/core/policies/
+#policies:
+#  - name: MemoizationPolicy
+#  - name: KerasPolicy
+#  - name: MappingPolicy
+
+# Configuration for Rasa NLU.
+# https://rasa.com/docs/rasa/nlu/components/
+# language: zh
+# pipeline:
+# - name: "tokenizer_jieba"
+# - name: "crf_entity_extractor" #条件随机场实体提取
+# - name: CountVectorsFeaturizer #意图和响应的词袋表示
+#   OOV_token: oov  #处理词汇量（OOV）词
+#   token_pattern: (?u)\b\w+\b
+# - name: EmbeddingIntentClassifier #词向量编码分类 意图实体识别
+#   epochs: 300
+# - name: EntitySynonymMapper #将同义实体值映射到相同的值
+
+
+language: "zh"
+
+pipeline:
+- name: "MitieNLP"
+  model: "data/total_word_feature_extractor_zh.dat"
+- name: "MitieTokenizer"
+  # Flag to check whether to split intents
+  "intent_tokenization_flag": False
+  # Regular expression to detect tokens
+  "token_pattern": None
+- name: "MitieFeaturizer"
+  "pooling": "mean"
+#- name: "MitieEntityExtractor"
+#- name: "EntitySynonymMapper"
+- name: "DIETClassifier"
+  epochs: 200
+  entity_recognition: False
+policies:
+- name: MemoizationPolicy
+  epochs: 200
+  max_history: 5
+- name: TEDPolicy
+  epochs: 200
+  max_history: 5
+- name: UnexpecTEDIntentPolicy
+  epochs: 200
